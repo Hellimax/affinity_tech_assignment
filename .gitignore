@@ -2,6 +2,9 @@
 /api/Fashion Data
 /api/.vscode
 /api/__pycache__
-/api/.env
 /api/project_env
 /api/affinitytechassigment-firebase-adminsdk-fbsvc-346d87eec8.json
+
+# API env files
+/api/.env
+/api/.env.*
