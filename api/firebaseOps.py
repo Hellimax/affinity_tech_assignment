@@ -3,7 +3,7 @@ from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
 
 import os
-from pydantic import BaseModel, Field
+
 
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -26,33 +26,6 @@ def get_db() -> firestore.Client:
 DB = get_db()
 COLLECTION_NAME = "FashionData"  # change if your collection is named differently
 
-
-class Product(BaseModel):
-    # Keep this permissive; your schema can be stricter if you wish
-    id: str
-    gender: Optional[str] = ""
-    masterCategory: Optional[str] = ""
-    subCategory: Optional[str] = ""
-    articleType: Optional[str] = ""
-    baseColour: Optional[str] = ""
-    season: Optional[str] = ""
-    year: Optional[int] = None
-    usage: Optional[str] = ""
-    productDisplayName: Optional[str] = ""
-    imageURL: Optional[str] = Field(default="", alias="image")  # adapt to your column if different
-
-    class Config:
-        validate_by_name = True
-        extra = "allow"  # allow extra fields if present
-
-
-class PageResponse(BaseModel):
-    page: int
-    page_size: int
-    total_count: int
-    total_pages: int
-    pages: List[int]
-    items: List[Dict[str, Any]]
 
 
 # ---------------------------

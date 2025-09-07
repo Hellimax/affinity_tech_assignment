@@ -3,6 +3,7 @@ from math import ceil
 from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
 import uvicorn
+from typing import List, Optional, Dict, Any
 
 import os
 
@@ -10,10 +11,10 @@ from fastapi import FastAPI, Query, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 
-from firebaseOps import DB, COLLECTION_NAME, Product, PageResponse, _apply_filters, _count_query, _sanitize
+from firebaseOps import DB, COLLECTION_NAME, _apply_filters, _count_query, _sanitize
 from pineconeOps import search_similar
 from fastapi import Body
-
+from pydantic import BaseModel, Field
 load_dotenv()  
 
 
@@ -37,6 +38,32 @@ app.add_middleware(
 )
 
 
+class Product(BaseModel):
+    # Keep this permissive; your schema can be stricter if you wish
+    id: str
+    gender: Optional[str] = ""
+    masterCategory: Optional[str] = ""
+    subCategory: Optional[str] = ""
+    articleType: Optional[str] = ""
+    baseColour: Optional[str] = ""
+    season: Optional[str] = ""
+    year: Optional[int] = None
+    usage: Optional[str] = ""
+    productDisplayName: Optional[str] = ""
+    imageURL: Optional[str] = Field(default="", alias="image")  # adapt to your column if different
+
+    class Config:
+        validate_by_name = True
+        extra = "allow"  # allow extra fields if present
+
+
+class PageResponse(BaseModel):
+    page: int
+    page_size: int
+    total_count: int
+    total_pages: int
+    pages: List[int]
+    items: List[Dict[str, Any]]
 # ---------------------------
 # Routes
 # ---------------------------
@@ -143,13 +170,18 @@ async def get_similar_images(file: UploadFile = File(...)):
     return JSONResponse(content={"items": similar_products})
 
 @app.post("/getrecommendations")
-async def getrecommendations(file_path: str = Body(..., embed=True)):
+async def getrecommendations(product: Product = Body(...)):
     """
     Endpoint to upload an image and return its filename.
     """
+    file_path = os.getenv("FILE_PATH_PREFIX") + product.id + ".jpg"
     results = search_similar(file_path)
     file_ids = [match['id'] for match in results]
+    file_ids = [x for x in file_ids if x != product.id] # Exclude the input product itself
     similar_products = get_products_for_multiple_ids(file_ids)
+
+    # Applying filters on Recommendataions
+    similar_products = [x for x in similar_products if x["masterCategory"]==product.masterCategory and x["subCategory"]==product.subCategory]
     return JSONResponse(content={"items": similar_products})
 
 

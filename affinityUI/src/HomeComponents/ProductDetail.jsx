@@ -17,16 +17,15 @@ export default function ProductDetail({ product, onBack }) {
       setLoading(true)
       setError(null)
 
-      const imagePath = `../images/${product.id}.jpg` //can be replaced with s3 storage path
+      const { image, ...productWithoutImage } = product
+    //   console.log("Fetching recommendations for product:", productWithoutImage);
 
       const response = await fetch("http://localhost:8000/getrecommendations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          file_path: imagePath,
-        }),
+        body: JSON.stringify(productWithoutImage),
       })
 
       if (!response.ok) {
@@ -104,34 +103,34 @@ export default function ProductDetail({ product, onBack }) {
             <div className="aspect-square overflow-hidden rounded-lg border border-border">
               <img
                 src={getImageSrc() || "/placeholder.svg"}
-                alt={product.productDisplayName || product.name || "Product"}
+                alt={product.productdisplayname || product.name || "Product"}
                 className="w-full h-full object-cover"
               />
             </div>
 
             {/* Product Details */}
             <div className="space-y-4">
-              <h1 className="text-2xl font-bold text-foreground">{product.productDisplayName || product.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{product.productdisplayname || product.name}</h1>
 
               <div className="grid grid-cols-2 gap-4">
-                {product.articleType && (
+                {product.article_type && (
                   <div>
                     <span className="text-sm text-muted-foreground">Article Type:</span>
-                    <p className="font-medium text-foreground">{product.articleType}</p>
+                    <p className="font-medium text-foreground">{product.article_type}</p>
                   </div>
                 )}
 
-                {product.masterCategory && (
+                {product.master_category && (
                   <div>
                     <span className="text-sm text-muted-foreground">Master Category:</span>
-                    <p className="font-medium text-foreground">{product.masterCategory}</p>
+                    <p className="font-medium text-foreground">{product.master_category}</p>
                   </div>
                 )}
 
-                {product.subCategory && (
+                {product.subcategory && (
                   <div>
                     <span className="text-sm text-muted-foreground">Subcategory:</span>
-                    <p className="font-medium text-foreground">{product.subCategory}</p>
+                    <p className="font-medium text-foreground">{product.subcategory}</p>
                   </div>
                 )}
 
@@ -142,10 +141,10 @@ export default function ProductDetail({ product, onBack }) {
                   </div>
                 )}
 
-                {product.baseColour && (
+                {product.basecolour && (
                   <div>
                     <span className="text-sm text-muted-foreground">Base Color:</span>
-                    <p className="font-medium text-foreground">{product.baseColour}</p>
+                    <p className="font-medium text-foreground">{product.basecolour}</p>
                   </div>
                 )}
 
