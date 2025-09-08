@@ -144,4 +144,8 @@ The API server should now be running (typically on `http://localhost:5000` or th
 The React application should now be running (typically on `http://localhost:3000` or `http://localhost:5173` for Vite).
 
 
+To Create the vector database and Firebase database, checkout out api/ExploreData.ipynb file
+
+
+
 
